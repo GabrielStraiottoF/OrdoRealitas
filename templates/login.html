@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Ordem Paranormal</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h1>Ordem Paranormal</h1>
+
+<form action="/login" method="POST">
+
+<input type="email" name="email" placeholder="Gmail" required>
+
+<input type="password" name="senha" placeholder="Senha" required>
+
+<select name="classe" id="classe">
+
+<option value="combatente">Combatente</option>
+<option value="especialista">Especialista</option>
+<option value="ocultista">Ocultista</option>
+
+</select>
+
+<button type="submit" class="bot_log">Login</button>
+
+</form>
+
+<a href="/cadastro">
+<button type="button" class="bot_cad">Cadastrar</button>
+</a>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

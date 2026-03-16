@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Cadastro</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h2>Novo Agente</h2>
+
+<form action="/registrar" method="POST">
+
+<input type="text" name="nome" placeholder="Nome" required>
+
+<input type="email" name="email" placeholder="Gmail" required>
+
+<input type="password" name="senha" placeholder="Senha" required>
+
+<select name="classe" id="classe">
+
+<option value="combatente">Combatente</option>
+<option value="especialista">Especialista</option>
+<option value="ocultista">Ocultista</option>
+
+</select>
+
+<button type="submit">Registrar</button>
+
+</form>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
