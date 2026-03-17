@@ -1,43 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 <head>
-
-<title>Cadastro</title>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+    <meta charset="UTF-8">
+    <title>Cadastro - Ordem Paranormal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<div class="login-box">
+    <div class="login-box">
+        <h2>Novo Agente</h2>
 
-<h2>Novo Agente</h2>
+        <form id="formCadastro">
+            <input type="text" id="nome" placeholder="Nome" required>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="senha" placeholder="Senha" required>
 
-<form action="/registrar" method="POST">
+            <select id="classe" name="classe">
+                <option value="" disabled selected>Selecione uma Classe</option>
+                <option value="combatante">Combatente</option>
+                <option value="especialista">Especialista</option>
+                <option value="ocultista">Ocultista</option>
+            </select>
 
-<input type="text" name="nome" placeholder="Nome" required>
+            <button type="submit">Registrar</button>
+        </form>
 
-<input type="email" name="email" placeholder="Gmail" required>
+        <p style="margin-top: 15px; font-size: 14px;">
+            Já tem conta? <a href="/" style="color: #b30000; text-decoration: none;">Voltar ao Login</a>
+        </p>
+    </div>
 
-<input type="password" name="senha" placeholder="Senha" required>
-
-<select name="classe" id="classe">
-
-<option value="combatente">Combatente</option>
-<option value="especialista">Especialista</option>
-<option value="ocultista">Ocultista</option>
-
-</select>
-
-<button type="submit">Registrar</button>
-
-</form>
-
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>

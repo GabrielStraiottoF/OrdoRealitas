@@ -1,19 +1,28 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import sqlite3
 
-conn = sqlite3.connect("banco.db")
-cursor = conn.cursor()
+app = Flask(__name__)
+CORS(app)
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS usuarios(
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-nome TEXT,
-email TEXT,
-senha TEXT,
-classe TEXT
-)
-""")
+@app.route('/registrar', methods=['POST'])
+def registrar():
+    dados = request.json 
+    
+    try:
+        con = sqlite3.connect("agentes.db")
+        cursor = con.cursor()
+        
+        cursor.execute("""
+            INSERT INTO agentes (nome, email, senha, classe) 
+            VALUES (?, ?, ?, ?)
+        """, (dados['nome'], dados['email'], dados['senha'], dados['classe']))
+        
+        con.commit()
+        con.close()
+        return jsonify({"mensagem": "Agente recrutado com sucesso!"}), 201
+    except Exception as e:
+        return jsonify({"mensagem": f"Falha na missão: {str(e)}"}), 400
 
-conn.commit()
-conn.close()
-
-print("Banco criado!")
+if __name__ == '__main__':
+    app.run(debug=True)

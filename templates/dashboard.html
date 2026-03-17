@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ficha de Agente - Ordo Realitas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="hub-container">
+        <nav class="hub-menu">
+            <button class="tab-btn active" onclick="abrirAba(event, 'aba-agente')">AGENTE</button>
+            <button class="tab-btn" onclick="abrirAba(event, 'aba-pericias')">PERÍCIAS</button>
+            <button id="btn-salvar-ficha" class="btn-salvar-ficha">SALVAR FICHA</button>
+            <button id="btn-logout" class="btn-sair-hub" onclick="window.location.href='/logout'">SAIR</button>
+        </nav>
+
+        <main class="hub-content">
+            <section id="aba-agente" class="tab-content active">
+                <div class="grid-identidade">
+                    <div class="campo-box">
+                        <label>NOME DO PERSONAGEM</label>
+                        <input type="text" id="nome-personagem">
+                    </div>
+                    <div class="campo-box">
+                        <label>NOME DO JOGADOR</label>
+                        <input type="text" id="nome-player">
+                    </div>
+                </div>
+
+                <div class="grid-identidade" style="grid-template-columns: 1fr 1fr 0.5fr;">
+                    <div class="campo-box">
+                        <label>ORIGEM</label>
+                        <input type="text" id="origem">
+                    </div>
+                    <div class="campo-box">
+                        <label>CLASSE</label>
+                        <select id="classe-display">
+                            <option value="combatante">Combatante</option>
+                            <option value="especialista">Especialista</option>
+                            <option value="ocultista">Ocultista</option>
+                        </select>
+                    </div>
+                    <div class="campo-box">
+                        <label>NEX</label>
+                        <input type="number" id="nex">
+                    </div>
+                </div>
+
+                <div class="atributos-container">
+                    <div class="attr agi"><label>AGI</label><input type="number" id="attr-agi"></div>
+                    <div class="attr for"><label>FOR</label><input type="number" id="attr-for"></div>
+                    <div class="attr int"><label>INT</label><input type="number" id="attr-int"></div>
+                    <div class="attr pre"><label>PRE</label><input type="number" id="attr-pre"></div>
+                    <div class="attr vig"><label>VIG</label><input type="number" id="attr-vig"></div>
+                </div>
+            </section>
+
+            <section id="aba-pericias" class="tab-content"></section>
+            <section id="aba-inventario" class="tab-content"></section>
+            <section id="aba-rituais" class="tab-content"></section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
