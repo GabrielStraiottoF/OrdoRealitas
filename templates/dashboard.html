@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Ficha de Agente - Ordo Realitas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body class="dashboard-body">
 
     <div class="hub-container">
@@ -14,7 +12,7 @@
             <button class="tab-btn active" onclick="abrirAba(event, 'aba-agente')">AGENTE</button>
             <button class="tab-btn" onclick="abrirAba(event, 'aba-pericias')">PERÍCIAS</button>
             <button id="btn-salvar-ficha" class="btn-salvar-ficha">SALVAR FICHA</button>
-            <button id="btn-logout" class="btn-sair-hub" onclick="window.location.href='/logout'">SAIR</button>
+            <button id="btn-logout" class="btn-sair-hub">SAIR</button>
         </nav>
 
         <main class="hub-content">
@@ -45,26 +43,63 @@
                     </div>
                     <div class="campo-box">
                         <label>NEX</label>
-                        <input type="number" id="nex">
+                        <input type="number" id="nex" value="5">
                     </div>
-                </div>
-
-                <div class="atributos-container">
-                    <div class="attr agi"><label>AGI</label><input type="number" id="attr-agi"></div>
-                    <div class="attr for"><label>FOR</label><input type="number" id="attr-for"></div>
-                    <div class="attr int"><label>INT</label><input type="number" id="attr-int"></div>
-                    <div class="attr pre"><label>PRE</label><input type="number" id="attr-pre"></div>
-                    <div class="attr vig"><label>VIG</label><input type="number" id="attr-vig"></div>
                 </div>
             </section>
 
-            <section id="aba-pericias" class="tab-content"></section>
-            <section id="aba-inventario" class="tab-content"></section>
-            <section id="aba-rituais" class="tab-content"></section>
+            <section id="aba-pericias" class="tab-content" style="display:none;">
+                <div class="pericias-header">
+                    <span>Perícia</span>
+                    <span>Treinamento</span>
+                    <span>Bônus</span>
+                </div>
+                <div id="lista-pericias">
+                    <div class="pericia-linha">
+                        <label>Acrobacia (AGI)</label>
+                        <select class="treino-select" data-pericia="acrobacia">
+                            <option value="0">Dtreinado</option>
+                            <option value="5">Treinado (+5)</option>
+                            <option value="10">Veterano (+10)</option>
+                            <option value="15">Expert (+15)</option>
+                        </select>
+                        <input type="number" id="bonus-acrobacia" value="0" readonly>
+                    </div>
+                    <div class="pericia-linha">
+                        <label>Atletismo (FOR)</label>
+                        <select class="treino-select" data-pericia="atletismo">
+                            <option value="0">Dtreinado</option>
+                            <option value="5">Treinado (+5)</option>
+                            <option value="10">Veterano (+10)</option>
+                            <option value="15">Expert (+15)</option>
+                        </select>
+                        <input type="number" id="bonus-atletismo" value="0" readonly>
+                    </div>
+                    <div class="pericia-linha">
+                        <label>Ocultismo (INT)</label>
+                        <select class="treino-select" data-pericia="ocultismo">
+                            <option value="0">Dtreinado</option>
+                            <option value="5">Treinado (+5)</option>
+                            <option value="10">Veterano (+10)</option>
+                            <option value="15">Expert (+15)</option>
+                        </select>
+                        <input type="number" id="bonus-ocultismo" value="0" readonly>
+                    </div>
+                    <div class="pericia-linha">
+                        <label>Percepção (PRE)</label>
+                        <select class="treino-select" data-pericia="percepcao">
+                            <option value="0">Dtreinado</option>
+                            <option value="5">Treinado (+5)</option>
+                            <option value="10">Veterano (+10)</option>
+                            <option value="15">Expert (+15)</option>
+                        </select>
+                        <input type="number" id="bonus-percepcao" value="0" readonly>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>

@@ -8,7 +8,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* --- LOGIN / CADASTRO --- */
+/* --- TEMA GERAL E FUNDOS --- */
 body {
     height: 100vh;
     background: #000;
@@ -16,49 +16,89 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: 'Share Tech Mono', monospace;
     transition: background 0.5s ease;
 }
 
-/* Restaura os fundos das classes */
 body.combatante { background: radial-gradient(circle, #2e0000 0%, #000 100%) !important; }
 body.especialista { background: radial-gradient(circle, #00152e 0%, #000 100%) !important; }
 body.ocultista { background: radial-gradient(circle, #1a002e 0%, #000 100%) !important; }
 
+/* --- CAIXA DE LOGIN --- */
 .login-box {
-    background: rgba(20, 20, 20, 0.95);
+    background: rgba(15, 15, 15, 0.98);
     padding: 40px;
-    width: 350px;
+    width: 380px;
     border: 1px solid #333;
     border-top: 4px solid var(--vermelho-ordem);
     text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Correção do Select e Inputs no Login */
+.login-box h1 {
+    font-family: 'Special Elite', cursive;
+    font-size: 28px;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+}
+
 .login-box input, .login-box select {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
-    background: #000;
-    border: 1px solid #444;
+    background: #050505;
+    border: 1px solid #333;
     color: white;
+    font-family: 'Share Tech Mono';
 }
 
-/* Forçar as opções do select a terem fundo escuro */
-select option {
-    background-color: #1a1a1a;
-    color: white;
-}
-
+/* --- BOTÕES E SEPARAÇÃO --- */
 .login-box button {
     width: 100%;
     padding: 12px;
-    background: var(--vermelho-ordem);
-    color: white;
-    border: none;
     cursor: pointer;
     font-weight: bold;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+    transition: 0.3s;
+    border: none;
+    border-radius: 2px;
 }
+
+/* Login - Vermelho */
+.btn-login {
+    background: var(--vermelho-ordem);
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 12px; /* Espaço entre os botões */
+}
+
+.btn-login:hover {
+    background: var(--vermelho-neon);
+    box-shadow: 0 0 15px var(--vermelho-neon);
+}
+
+/* Cadastro - Estilo Secundário */
+.btn-cadastro {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #888 !important;
+    border: 1px solid #333 !important;
+}
+
+.btn-cadastro:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--vermelho-ordem) !important;
+}
+
+.texto-senha {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #555;
+}
+
+.texto-senha a { color: #4b0082; text-decoration: none; font-weight: bold; }
+.texto-senha a:hover { color: var(--vermelho-neon); text-decoration: underline; }
 
 /* --- DASHBOARD HUB --- */
 body.dashboard-body {
@@ -70,86 +110,104 @@ body.dashboard-body {
 .hub-container { display: flex; width: 100%; height: 100vh; }
 
 .hub-menu {
-    width: 240px;
+    width: 260px;
     background: #000;
     border-right: 2px solid var(--vermelho-ordem);
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 25px;
 }
 
-.hub-content { flex: 1; padding: 40px; overflow-y: auto; }
+.hub-content { flex: 1; padding: 40px; overflow-y: auto; background: #050505; }
 
-/* Identidade Separada */
+/* Identidade */
 .grid-identidade {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-.campo-box { display: flex; flex-direction: column; }
-.campo-box label { font-size: 10px; color: var(--vermelho-ordem); margin-bottom: 5px; }
+.campo-box label { font-size: 11px; color: var(--vermelho-ordem); text-transform: uppercase; }
 .campo-box input, .campo-box select {
     background: transparent;
     border: none;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid #333;
     color: white;
-    font-family: 'Special Elite';
     padding: 8px 0;
+    width: 100%;
 }
 
-/* Atributos Circulares Corrigidos */
+/* Atributos Circulares */
 .atributos-container {
     position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 40px auto;
+    width: 280px;
+    height: 280px;
+    margin: 50px auto;
+    border: 1px dashed rgba(255,255,255,0.1);
     border-radius: 50%;
-    border: 1px dashed #333;
 }
 
-.attr {
-    position: absolute;
-    width: 60px;
-    text-align: center;
-    z-index: 10;
-}
-
-/* Posicionamento radial */
-.agi { top: -20px; left: 50%; transform: translateX(-50%); }
-.for { top: 80px; right: -20px; }
-.int { bottom: 10px; right: 30px; }
-.pre { bottom: 10px; left: 30px; }
-.vig { top: 80px; left: -20px; }
+.attr { position: absolute; width: 65px; text-align: center; }
+.agi { top: -25px; left: 50%; transform: translateX(-50%); }
+.for { top: 75px; right: -25px; }
+.int { bottom: 0; right: 25px; }
+.pre { bottom: 0; left: 25px; }
+.vig { top: 75px; left: -25px; }
 
 .attr input {
-    width: 55px;
-    height: 55px;
-    background: #111 !important;
+    width: 60px;
+    height: 60px;
+    background: #0a0a0a !important;
     border: 2px solid var(--vermelho-ordem) !important;
-    border-radius: 50% !important;
-    color: white !important;
+    border-radius: 50%;
+    color: white;
     text-align: center;
-    font-size: 22px;
+    font-size: 24px;
+    box-shadow: inset 0 0 10px rgba(179, 0, 0, 0.3);
+}
+
+.btn-salvar-ficha { background: var(--vermelho-ordem); color: white; padding: 15px; border: none; margin-top: auto; cursor: pointer; }
+.btn-sair-hub { background: transparent; border: 1px solid #333; color: #444; padding: 10px; margin-top: 10px; cursor: pointer; }
+
+/* --- ESTILO DA ABA DE PERÍCIAS --- */
+.pericias-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 10px;
+    border-bottom: 2px solid var(--vermelho-ordem);
+    font-weight: bold;
+    font-size: 12px;
+    color: var(--vermelho-ordem);
+    text-transform: uppercase;
+}
+
+.pericia-linha {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid #222;
+}
+
+.pericia-linha label {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.pericia-linha select {
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    padding: 4px;
     font-family: 'Share Tech Mono';
 }
 
-/* Botões Funcionais */
-.btn-salvar-ficha { 
-    background: var(--vermelho-ordem); 
-    color: white; 
-    padding: 15px; 
-    border: none; 
-    cursor: pointer; 
-    margin-top: auto; 
-}
-
-.btn-sair-hub { 
-    background: transparent; 
-    border: 1px solid #444; 
-    color: #666; 
-    padding: 10px; 
-    margin-top: 10px; 
-    cursor: pointer; 
+.pericia-linha input {
+    background: transparent !important;
+    border: none !important;
+    color: var(--vermelho-neon);
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
 }

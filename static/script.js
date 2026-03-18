@@ -4,14 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
     inicializarDashboard();
     configurarLogout();
     configurarMudancaDeClasse();
+    inicializarPericias(); // Ativa a lógica de bônus automático
 });
 
 // --- CORES DO LOGIN/CADASTRO ---
-// Garante que o fundo mude conforme a classe selecionada antes de logar
 function inicializarTrocaDeCores() {
     const seletor = document.getElementById("classe");
     if (seletor) {
-        // Aplica a cor inicial caso o navegador lembre da seleção anterior
         if (seletor.value) document.body.className = seletor.value;
         
         seletor.addEventListener("change", () => {
@@ -34,7 +33,6 @@ if (formLogin) {
             });
             const res = await resposta.json();
             if (resposta.ok) {
-                // Importante: O back-end deve retornar o objeto 'agente'
                 localStorage.setItem('agente', JSON.stringify(res.agente));
                 window.location.href = "/dashboard";
             } else {
@@ -76,7 +74,7 @@ if (formCadastro) {
 document.addEventListener('click', (e) => {
     if (e.target.id === 'link-esqueci') {
         e.preventDefault();
-        const modal = document.getElementById('modal-foto'); // Verifique se o ID no HTML é esse mesmo
+        const modal = document.getElementById('modal-foto');
         if (modal) modal.style.display = 'block';
     }
     if (e.target.id === 'btn-fechar-modal') {
@@ -100,17 +98,17 @@ function inicializarDashboard() {
         if (document.getElementById('nome-personagem')) document.getElementById('nome-personagem').value = agente.nome || "";
         if (document.getElementById('classe-display')) {
             document.getElementById('classe-display').value = agente.classe;
-            document.body.className = agente.classe; // Aplica a cor da classe ao fundo
+            document.body.className = agente.classe;
         }
 
-        // 2. Preenche dados extras do banco
+        // 2. Preenche dados extras salvos
         if (agente.dados_salvos) {
             const d = agente.dados_salvos;
             if(d.nome_player && document.getElementById('nome-player')) document.getElementById('nome-player').value = d.nome_player;
             if(d.origem && document.getElementById('origem')) document.getElementById('origem').value = d.origem;
             if(d.nex && document.getElementById('nex')) document.getElementById('nex').value = d.nex;
 
-            // Atributos no Círculo
+            // Atributos
             if(d.atributos) {
                 document.getElementById('attr-agi').value = d.atributos.agi || 0;
                 document.getElementById('attr-for').value = d.atributos.for || 0;
@@ -142,15 +140,29 @@ function configurarMudancaDeClasse() {
     }
 }
 
+// --- PERÍCIAS ---
+function inicializarPericias() {
+    const seletores = document.querySelectorAll('.treino-select');
+    seletores.forEach(select => {
+        select.addEventListener('change', (e) => {
+            const pericia = e.target.getAttribute('data-pericia');
+            const valor = e.target.value;
+            const inputBonus = document.getElementById(`bonus-${pericia}`);
+            if (inputBonus) {
+                inputBonus.value = valor;
+            }
+        });
+    });
+}
+
 // --- FUNÇÃO PARA SALVAR A FICHA ---
 async function enviarDadosParaServidor() {
     const agenteLogado = JSON.parse(localStorage.getItem('agente'));
     if (!agenteLogado) {
-        alert("Sessão expirada! Faça login novamente.");
+        alert("Sessão expirada!");
         return;
     }
 
-    // Coleta todos os dados dos inputs
     const fichaCompleta = {
         email_dono: agenteLogado.email || agenteLogado.gmail,
         nome_personagem: document.getElementById('nome-personagem').value,
@@ -184,7 +196,6 @@ async function enviarDadosParaServidor() {
 
         const res = await resposta.json();
         if (resposta.ok) {
-            // Atualiza o localStorage com os novos dados para não perder ao dar F5
             agenteLogado.dados_salvos = fichaCompleta;
             localStorage.setItem('agente', JSON.stringify(agenteLogado));
             alert("Ficha salva com sucesso!");
@@ -193,7 +204,6 @@ async function enviarDadosParaServidor() {
         }
     } catch (erro) {
         console.error("Erro ao salvar:", erro);
-        alert("Erro de conexão com o servidor.");
     }
 }
 
