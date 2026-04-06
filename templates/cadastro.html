@@ -8,27 +8,31 @@
 </head>
 
 <body>
+    
+    <!-- Notification Toast -->
+    <div id="toast-notificacao" class="toast">Notificação padrão</div>
 
     <div class="login-box">
-        <h2>Novo Agente</h2>
+        <h1 style="color: #666; font-size: 24px;">RECRUTAMENTO</h1>
+        <h2 style="color: var(--vermelho-ordem);">Novo Agente</h2>
 
         <form id="formCadastro">
-            <input type="text" id="nome" placeholder="Nome" required>
+            <input type="text" id="nome" placeholder="Nome Completo" required>
             <input type="email" id="email" placeholder="E-mail" required>
-            <input type="password" id="senha" placeholder="Senha" required>
+            <input type="password" id="senha" placeholder="Criar Senha" required>
 
-            <select id="classe" name="classe">
-                <option value="" disabled selected>Selecione uma Classe</option>
+            <select id="classe" name="classe" required>
+                <option value="" disabled selected>Classe Inicial</option>
                 <option value="combatante">Combatente</option>
                 <option value="especialista">Especialista</option>
                 <option value="ocultista">Ocultista</option>
             </select>
 
-            <button type="submit">Registrar</button>
+            <button type="submit" class="btn-login" style="margin-top: 20px;">REGISTRAR-SE NA ORDEM</button>
         </form>
 
-        <p style="margin-top: 15px; font-size: 14px;">
-            Já tem conta? <a href="/" style="color: #b30000; text-decoration: none;">Voltar ao Login</a>
+        <p style="margin-top: 25px; font-size: 14px; font-family: 'Inter', sans-serif;">
+            <a href="/" style="color: #b30000; text-decoration: none; font-weight: bold; padding-bottom: 2px; border-bottom: 1px solid #b30000;">VOLTAR AO ACESSO</a>
         </p>
     </div>
 

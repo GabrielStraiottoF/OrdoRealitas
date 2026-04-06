@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import json
 
@@ -9,12 +10,11 @@ CORS(app)
 def criar_tabela():
     con = sqlite3.connect("agentes.db")
     cursor = con.cursor()
-    # Criamos a tabela. A coluna ficha_json armazenará o "pacotão" de dados da ficha
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS agentes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
-            gmail TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
             senha TEXT NOT NULL,
             classe TEXT NOT NULL,
             ficha_json TEXT
@@ -39,28 +39,29 @@ def dashboard():
 def registrar():
     dados = request.json
     try:
+        senha_hash = generate_password_hash(dados['senha'])
         con = sqlite3.connect("agentes.db")
         cursor = con.cursor()
-        cursor.execute("INSERT INTO agentes (nome, gmail, senha, classe) VALUES (?, ?, ?, ?)",
-                       (dados['nome'], dados['gmail'], dados['senha'], dados['classe']))
+        cursor.execute("INSERT INTO agentes (nome, email, senha, classe) VALUES (?, ?, ?, ?)",
+                       (dados['nome'], dados['email'], senha_hash, dados['classe']))
         con.commit()
         con.close()
         return jsonify({"mensagem": "Agente Registrado com sucesso!"}), 201
     except sqlite3.IntegrityError:
         return jsonify({"mensagem": "Este e-mail já está na base!"}), 400
+    except Exception as e:
+        return jsonify({"mensagem": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
     dados = request.json
     con = sqlite3.connect("agentes.db")
     cursor = con.cursor()
-    # O email no banco está como 'gmail', mas no login você recebe como 'email'
-    cursor.execute("SELECT * FROM agentes WHERE gmail = ? AND senha = ?", (dados['email'], dados['senha']))
+    cursor.execute("SELECT * FROM agentes WHERE email = ?", (dados['email'],))
     agente = cursor.fetchone()
     con.close()
 
-    if agente:
-        # Tenta carregar os dados da ficha. Se estiver vazio (None), retorna um dicionário vazio {}
+    if agente and check_password_hash(agente[3], dados['senha']):
         try:
             dados_ficha = json.loads(agente[5]) if agente[5] else {}
         except:
@@ -75,21 +76,25 @@ def login():
                 "dados_salvos": dados_ficha
             }
         }), 200
-    return jsonify({"mensagem": "Acesso negado."}), 401
+    return jsonify({"mensagem": "E-mail ou senha inválidos."}), 401
 
 @app.route('/salvar_ficha', methods=['POST'])
 def salvar_ficha():
     dados = request.get_json()
     email_agente = dados.get('email_dono')
     
-    # Serializa o dicionário da ficha para uma string de texto para salvar no SQLite
     ficha_string = json.dumps(dados)
 
     try:
         con = sqlite3.connect("agentes.db")
         cursor = con.cursor()
-        # Atualiza apenas a ficha do agente dono daquele email
-        cursor.execute("UPDATE agentes SET ficha_json = ? WHERE gmail = ?", (ficha_string, email_agente))
+        cursor.execute("UPDATE agentes SET ficha_json = ? WHERE email = ?", (ficha_string, email_agente))
+        
+        # Check if the update actually modified any rows
+        if cursor.rowcount == 0:
+            con.close()
+            return jsonify({"mensagem": "Agente não encontrado na base de dados!"}), 404
+            
         con.commit()
         con.close()
         return jsonify({"mensagem": "Ficha sincronizada com a Ordem!"}), 200
