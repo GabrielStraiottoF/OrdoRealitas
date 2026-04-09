@@ -166,6 +166,7 @@ if (formLogin) {
             const res = await resposta.json();
             if (resposta.ok) {
                 localStorage.setItem('agente', JSON.stringify(res.agente));
+                localStorage.setItem('auth_token', res.token);
                 window.location.href = "/dashboard";
             } else {
                 alert(res.mensagem);
@@ -410,12 +411,21 @@ async function enviarDadosParaServidor() {
     };
 
     try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            mostrarNotificacao("Sessão inválida. Por favor, faça login novamente.", true);
+            return;
+        }
+
         const btn = document.getElementById('btn-salvar-ficha');
         btn.textContent = "SALVANDO...";
         
         const resposta = await fetch('/salvar_ficha', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(fichaCompleta)
         });
 
@@ -449,6 +459,7 @@ function configurarLogout() {
         btnSair.addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.removeItem('agente');
+            localStorage.removeItem('auth_token');
             window.location.href = "/";
         });
     }

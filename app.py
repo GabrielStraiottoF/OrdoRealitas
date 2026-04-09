@@ -1,27 +1,27 @@
+import os
+import json
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
-import json
+from dotenv import load_dotenv
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from models import db, Agente
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-def criar_tabela():
-    con = sqlite3.connect("agentes.db")
-    cursor = con.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS agentes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            senha TEXT NOT NULL,
-            classe TEXT NOT NULL,
-            ficha_json TEXT
-        )
-    """)
-    con.commit()
-    con.close()
+# Configurações usando Variáveis de Ambiente
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-development')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback-jwt-secret-development')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///agentes_orm.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializar extensões
+db.init_app(app)
+jwt = JWTManager(app)
 
 @app.route('/')
 def index():
@@ -39,69 +39,79 @@ def dashboard():
 def registrar():
     dados = request.json
     try:
+        # Verificar se o email já existe
+        agente_existente = Agente.query.filter_by(email=dados['email']).first()
+        if agente_existente:
+            return jsonify({"mensagem": "Este e-mail já está na base!"}), 400
+
         senha_hash = generate_password_hash(dados['senha'])
-        con = sqlite3.connect("agentes.db")
-        cursor = con.cursor()
-        cursor.execute("INSERT INTO agentes (nome, email, senha, classe) VALUES (?, ?, ?, ?)",
-                       (dados['nome'], dados['email'], senha_hash, dados['classe']))
-        con.commit()
-        con.close()
+        novo_agente = Agente(
+            nome=dados['nome'],
+            email=dados['email'],
+            senha=senha_hash,
+            classe=dados['classe']
+        )
+        db.session.add(novo_agente)
+        db.session.commit()
         return jsonify({"mensagem": "Agente Registrado com sucesso!"}), 201
-    except sqlite3.IntegrityError:
-        return jsonify({"mensagem": "Este e-mail já está na base!"}), 400
     except Exception as e:
-        return jsonify({"mensagem": f"Erro interno: {str(e)}"}), 500
+        db.session.rollback()
+        return jsonify({"mensagem": "Erro interno no servidor."}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
     dados = request.json
-    con = sqlite3.connect("agentes.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM agentes WHERE email = ?", (dados['email'],))
-    agente = cursor.fetchone()
-    con.close()
+    agente = Agente.query.filter_by(email=dados['email']).first()
 
-    if agente and check_password_hash(agente[3], dados['senha']):
+    if agente and check_password_hash(agente.senha, dados['senha']):
         try:
-            dados_ficha = json.loads(agente[5]) if agente[5] else {}
+            dados_ficha = json.loads(agente.ficha_json) if agente.ficha_json else {}
         except:
             dados_ficha = {}
 
+        # Criar o token de acesso
+        access_token = create_access_token(identity=agente.email)
+
         return jsonify({
             "mensagem": "Acesso autorizado!",
+            "token": access_token,
             "agente": {
-                "nome": agente[1], 
-                "email": agente[2], 
-                "classe": agente[4],
+                "nome": agente.nome, 
+                "email": agente.email, 
+                "classe": agente.classe,
                 "dados_salvos": dados_ficha
             }
         }), 200
+    
     return jsonify({"mensagem": "E-mail ou senha inválidos."}), 401
 
 @app.route('/salvar_ficha', methods=['POST'])
+@jwt_required()
 def salvar_ficha():
+    # O email vem direto do token confiável gerado no login
+    email_logado = get_jwt_identity()
     dados = request.get_json()
-    email_agente = dados.get('email_dono')
-    
+
+    # Sobrescreve/Garante que o e-mail no JSON é o do usuário logado
+    dados['email_dono'] = email_logado
     ficha_string = json.dumps(dados)
 
     try:
-        con = sqlite3.connect("agentes.db")
-        cursor = con.cursor()
-        cursor.execute("UPDATE agentes SET ficha_json = ? WHERE email = ?", (ficha_string, email_agente))
-        
-        # Check if the update actually modified any rows
-        if cursor.rowcount == 0:
-            con.close()
+        agente = Agente.query.filter_by(email=email_logado).first()
+        if not agente:
             return jsonify({"mensagem": "Agente não encontrado na base de dados!"}), 404
             
-        con.commit()
-        con.close()
+        agente.ficha_json = ficha_string
+        db.session.commit()
+        
         return jsonify({"mensagem": "Ficha sincronizada com a Ordem!"}), 200
     except Exception as e:
-        print(f"Erro ao salvar: {e}")
-        return jsonify({"mensagem": f"Erro interno: {str(e)}"}), 500
+        db.session.rollback()
+        return jsonify({"mensagem": "Erro interno ao salvar a ficha."}), 500
 
 if __name__ == '__main__':
-    criar_tabela()
-    app.run(debug=True)
+    # O Gunicorn será usado. Rodando esse arquivo fará um fallback simples.
+    with app.app_context():
+        # Apenas como utilidade local
+        pass
+    app.run()
