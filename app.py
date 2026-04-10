@@ -16,12 +16,19 @@ CORS(app)
 # Configurações usando Variáveis de Ambiente
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-development')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback-jwt-secret-development')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///agentes_orm.db')
+
+db_url = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///agentes_orm.db')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicializar extensões
 db.init_app(app)
 jwt = JWTManager(app)
+
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
@@ -112,6 +119,7 @@ def salvar_ficha():
 if __name__ == '__main__':
     # O Gunicorn será usado. Rodando esse arquivo fará um fallback simples.
     with app.app_context():
-        # Apenas como utilidade local
-        pass
-    app.run()
+        # Apenas como utilidade local para criar tabelas se preciso
+        db.create_all()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
