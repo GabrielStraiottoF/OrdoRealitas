@@ -239,6 +239,8 @@ function inicializarDashboard() {
         setVal('classe-display', d.classe || agente.classe);
         setVal('nex', d.nex || 5);
         setVal('nivel-gastos', d.nivel_gastos || "baixo");
+        setVal('url-token', d.url_token || "");
+        if(typeof atualizarTokenHTML === 'function') atualizarTokenHTML();
 
         // Attrs
         if(d.atributos) {
@@ -349,6 +351,7 @@ async function enviarDadosParaServidor() {
         nome_player: val('nome-player'),
         origem: val('origem'),
         trilha: val('trilha'),
+        url_token: val('url-token'),
         nivel_gastos: val('nivel-gastos'),
         classe: val('classe-display'),
         nex: val('nex'),
@@ -756,4 +759,22 @@ function rolarDadoGenericoTab() {
     let str = `[ ${rolagens.join(' + ')} ] d${faces}  +  Bônus(${bonus})`;
     
     mostrarResultadoDadoHTML(total, str, false, false);
+}
+
+// TOKEN IMAGEM
+function atualizarTokenHTML() {
+    const url = document.getElementById('url-token')?.value;
+    const img = document.getElementById('token-img');
+    const placeholder = document.getElementById('token-placeholder');
+    if (!img || !placeholder) return;
+
+    if (url && url.length > 5) {
+        img.src = url;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+    } else {
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+    }
 }

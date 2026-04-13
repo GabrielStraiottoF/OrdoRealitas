@@ -12,6 +12,11 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+select option {
+    background-color: var(--cinza-dark);
+    color: #fff;
+}
+
 body {
     height: 100vh;
     background: var(--preto-abs);
@@ -124,8 +129,6 @@ body.ocultista { background: radial-gradient(circle at center, #1a002e 0%, #000 
 }
 .toast.show { right: 20px; }
 .toast.error { background: #800000; border: 1px solid #ff4d4d; }
-
-/* --- DASHBOARD HUB --- */
 body.dashboard-body {
     align-items: stretch;
 }
@@ -462,3 +465,317 @@ body.dashboard-body {
 .dice-line-history { font-size: 16px; color: #999; letter-spacing: 2px; font-family: 'Share Tech Mono'; margin-top: 10px;}
 .crit-success { color: #ffcc00; text-shadow: 0 0 15px #ffcc00; }
 .crit-fail { color: #ff3333; text-shadow: 0 0 15px #ff3333; }
+
+/* --- RESPONSIVIDADE (MOBILE) --- */
+@media (max-width: 768px) {
+    /* Login e Cadastro */
+    .login-box {
+        width: 90%;
+        padding: 30px 20px;
+    }
+
+    /* Dashboard Hub */
+    body.dashboard-body {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hub-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hub-menu {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #222;
+        padding: 15px 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .logo-area {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .tab-btn {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        font-size: 12px;
+    }
+
+    .tab-btn.active {
+        border-left-color: transparent !important;
+        border-bottom-color: var(--vermelho-ordem) !important;
+        background: linear-gradient(0deg, rgba(179,0,0,0.15) 0%, transparent 100%) !important;
+    }
+
+    .btn-salvar-ficha, .btn-sair-hub {
+        width: 45%;
+        margin: 10px 2.5%;
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .hub-content {
+        padding: 15px;
+    }
+
+    /* Grid Identidade */
+    .grid-identidade {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Atributos e Status */
+    .status-atributos-wrapper {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .atributos-container {
+        transform: scale(0.9);
+        margin: 10px auto;
+    }
+
+    /* Defesas e Resistencias */
+    .defesas-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .box-neo > div[style*="column"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .defesa-item input {
+        font-size: 18px !important;
+        padding: 2px !important;
+    }
+
+    .box-neo > div[style*="grid-template-columns"], .box-neo > div[style*="grid"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Pericias */
+    .pericias-header {
+        font-size: 9px;
+        padding: 10px 5px;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    }
+    
+    .pericia-linha {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        padding: 10px 5px;
+    }
+    
+    .pericia-linha label { font-size: 12px; }
+    .pericia-linha input.extra, .pericia-linha select { font-size: 11px; padding: 4px; }
+    .pericia-total { font-size: 14px; }
+
+    /* Rituais e Poderes */
+    .grid-poderes, .grid-rituais {
+        grid-template-columns: 1fr;
+    }
+
+    /* Inventario */
+    .inventario-header {
+        display: none !important;
+    }
+
+    .arma-linha {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #333;
+        border-left: 4px solid var(--vermelho-ordem);
+        background: rgba(20,20,20,0.8);
+    }
+
+    .arma-linha input, .arma-linha select {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .item-linha {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #222;
+        border-left: 4px solid #555;
+        background: rgba(10,10,10,0.8);
+    }
+    
+    .item-linha input, .item-linha select {
+        width: 100%;
+    }
+
+    /* Rolador de Dados */
+    section#aba-dados > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .box-neo > div[style*="display: flex"] {
+        flex-direction: column;
+    }
+}
+
+/* ========================================================
+   PREMIUM UI ENHANCEMENTS FOR PRINCIPAL TAB
+   ======================================================== */
+
+.glass-panel {
+    background: rgba(14, 14, 14, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    transition: box-shadow 0.3s ease;
+}
+
+.glass-panel:hover {
+    box-shadow: 0 8px 32px rgba(179, 0, 0, 0.15);
+}
+
+.glass-panel-dashed {
+    background: rgba(10, 10, 10, 0.5);
+    border: 1px dashed rgba(85, 85, 85, 0.6);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
+}
+
+/* Typography Enhancements */
+.glow-text {
+    text-shadow: 0 0 10px rgba(179,0,0,0.6);
+    font-size: 28px !important;
+    letter-spacing: 1px;
+}
+.glow-text-small {
+    font-family: 'Share Tech Mono'; 
+    color: var(--vermelho-ordem); 
+    margin: 0; 
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+/* Identity Grid */
+.perfil-header {
+    display: flex; gap: 25px; align-items: stretch; flex-wrap: wrap; margin-bottom: 40px;
+}
+.token-area {
+    display: flex; flex-direction: column; align-items: center; width: 150px;
+}
+.token-img-wrapper {
+    width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--vermelho-ordem); 
+    box-shadow: 0 0 15px rgba(179,0,0,0.5); overflow: hidden; background: #0a0a0a; 
+    display: flex; justify-content: center; align-items: center; margin-bottom: 12px;
+    transition: 0.4s;
+}
+.token-img-wrapper:hover {
+    box-shadow: 0 0 25px rgba(179,0,0,0.8);
+    transform: scale(1.05);
+}
+#token-placeholder {
+    color: #555; font-size: 12px; text-align: center; font-family: 'Share Tech Mono'; letter-spacing: 1px;
+}
+
+.input-cyber {
+    width: 100%; background: rgba(0,0,0,0.6); border: 1px solid #333; 
+    color: white; padding: 10px; font-size: 12px; text-align: center; 
+    border-radius: 4px; font-family: 'Share Tech Mono';
+    transition: border-color 0.3s; margin-bottom: 5px;
+}
+.input-cyber:focus {
+    border-color: var(--vermelho-ordem); outline:none; box-shadow: var(--borda-glow);
+}
+.input-cyber-small {
+    background: #000; border: 1px solid #555; color: white; 
+    text-align: center; font-family: 'Share Tech Mono'; padding: 4px; 
+    border-radius: 3px; height: 26px; width: 45px; transition: border 0.3s;
+}
+.input-cyber-small:focus { border-color: var(--vermelho-neon); outline:none; }
+
+.grid-identidade {
+    flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 0 !important;
+}
+
+.nex-gastos-box {
+    display: flex; gap: 10px; background: transparent !important; border: none !important; padding:0 !important;
+}
+.nex-subbox { flex: 0.4; background: var(--cinza-dark); padding: 12px 15px; border-radius: 6px; border: 1px solid #222; }
+.gastos-subbox { flex: 1; background: var(--cinza-dark); padding: 12px 15px; border-radius: 6px; border: 1px solid #222; }
+.nex-subbox label, .gastos-subbox label { font-size: 11px; color: var(--cinza-light); text-transform: uppercase; display: block; margin-bottom: 5px; }
+.nex-subbox input, .gastos-subbox select { width: 100%; background: transparent; border: none; color: white; font-size: 16px; font-family: 'Share Tech Mono'; outline:none; }
+
+/* Status Enhancements */
+.status-health-label {
+    text-align: center; font-size: 11px; font-weight: bold; 
+    padding-bottom: 8px; text-transform: uppercase; color: #888;
+    letter-spacing: 1px;
+}
+.sh-title { font-weight: bold; letter-spacing: 1px; }
+.flex-header { display: flex; justify-content: space-between; align-items: center; }
+.limite-turno { font-size: 11px; color: #888; font-family: 'Inter'; font-weight: normal; }
+.divisor { font-size: 24px; color: #444; margin: 0 10px; font-weight: 300; }
+
+/* Attributes Pentagram */
+.premium-hexagon .pentagram-lines {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
+}
+.premium-hexagon .attr { z-index: 2; }
+.premium-hexagon .attr input {
+    background: rgba(5,5,5,0.95) !important;
+    border: 2px solid rgba(179,0,0,0.6) !important;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.premium-hexagon .attr input:hover {
+    transform: scale(1.1); box-shadow: 0 0 20px rgba(179,0,0,0.8) !important;
+    border-color: var(--vermelho-neon) !important;
+}
+
+/* Defesas and Resistencias */
+.box-neo-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;}
+.deslocamento-label { font-size: 12px; color: var(--cinza-light); display: flex; align-items: center; gap: 8px; }
+
+.defesas-flex { display: flex; gap: 15px; }
+.defesa-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.def-title { font-size: 11px; color: #888; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px; }
+.def-input { 
+    width: 100%; text-align: center; font-size: 22px !important; background: transparent; 
+    border: 1px solid #333; color: white; padding: 10px 5px; border-radius: 6px; 
+    font-family: 'Share Tech Mono'; transition: background 0.3s, border-color 0.3s;
+}
+
+.def-equip-box { flex: 0.8; }
+.equip-color { color: #ffaa00; }
+.equip-input { background: rgba(34,34,34,0.6); border: 1px dashed #ffaa00; color: #ffaa00; font-size: 18px !important;}
+.equip-input:focus { background: rgba(34,34,34,0.9); }
+
+.rd-geral-box { flex: 0.8; }
+.rd-color { color: #00eeff; }
+.rd-input { background: rgba(17,17,17,0.6); border: 1px solid #00eeff; color: #00eeff; font-size: 18px !important;}
+
+.resistencias-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.res-item { 
+    display: flex; justify-content: space-between; align-items: center; 
+    font-family: 'Inter'; font-size: 14px; color: #ccc; 
+    background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 4px; border: 1px solid #222;
+    transition: background 0.3s;
+}
+.res-item:hover { background: rgba(30,30,30,0.8); border-color: #444; }
+
+/* Condicoes */
+.condicoes-flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;}

@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha de Agente - Ordem Paranormal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -27,43 +28,56 @@
             <!-- ABA: PRINCIPAL (IDENTIDADE, STATUS E ATRIBUTOS) -->
             <section id="aba-agente" class="tab-content active">
                 
-                <h2 class="section-title">Identificação</h2>
-                <div class="grid-identidade">
-                    <div class="campo-box">
-                        <label>Personagem</label>
-                        <input type="text" id="nome-personagem">
+                <h2 class="section-title glow-text">Identificação</h2>
+                <div class="perfil-header glass-panel">
+                    <!-- Area do Token de Imagem -->
+                    <div class="token-area">
+                        <div class="token-img-wrapper">
+                            <img id="token-img" src="" alt="Token" style="display: none;">
+                            <span id="token-placeholder">SEM<br>IMAGEM</span>
+                        </div>
+                        <input type="text" id="url-token" class="input-cyber" placeholder="URL da Imagem" oninput="atualizarTokenHTML()">
                     </div>
-                    <div class="campo-box">
-                        <label>Jogador</label>
-                        <input type="text" id="nome-player">
-                    </div>
-                    <div class="campo-box">
-                        <label>Origem</label>
-                        <input type="text" id="origem">
-                    </div>
-                    <div class="campo-box">
-                        <label>Classe</label>
-                        <select id="classe-display">
-                            <option value="combatante">Combatente</option>
-                            <option value="especialista">Especialista</option>
-                            <option value="ocultista">Ocultista</option>
-                        </select>
-                    </div>
-                    <div class="campo-box">
-                        <label>Trilha</label>
-                        <input type="text" id="trilha">
-                    </div>
-                    <div class="campo-box">
-                        <label>NEX</label>
-                        <input type="number" id="nex" value="5">
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: #888;">Nível de Gastos</label>
-                            <select id="nivel-gastos" style="width: 100%; background: #000; border: 1px solid #444; color: white; padding: 10px; border-radius: 4px; font-family: 'Share Tech Mono';">
-                                <option value="baixo">Baixo (Carga 0/I)</option>
-                                <option value="medio">Médio (Carga II)</option>
-                                <option value="alto">Alto (Carga III)</option>
-                                <option value="ilimitado">Ilimitado (Carga IV)</option>
+
+                    <div class="grid-identidade">
+                        <div class="campo-box">
+                            <label>Personagem</label>
+                            <input type="text" id="nome-personagem">
+                        </div>
+                        <div class="campo-box">
+                            <label>Jogador</label>
+                            <input type="text" id="nome-player">
+                        </div>
+                        <div class="campo-box">
+                            <label>Origem</label>
+                            <input type="text" id="origem">
+                        </div>
+                        <div class="campo-box">
+                            <label>Classe</label>
+                            <select id="classe-display">
+                                <option value="combatante">Combatente</option>
+                                <option value="especialista">Especialista</option>
+                                <option value="ocultista">Ocultista</option>
                             </select>
+                        </div>
+                        <div class="campo-box">
+                            <label>Trilha</label>
+                            <input type="text" id="trilha">
+                        </div>
+                        <div class="campo-box nex-gastos-box">
+                            <div class="nex-subbox">
+                                <label>NEX</label>
+                                <input type="number" id="nex" value="5">
+                            </div>
+                            <div class="gastos-subbox">
+                                <label>Nível de Gastos</label>
+                                <select id="nivel-gastos" class="input-cyber">
+                                    <option value="baixo">Baixo (0/I)</option>
+                                    <option value="medio">Médio (II)</option>
+                                    <option value="alto">Alto (III)</option>
+                                    <option value="ilimitado">Ilimitado (IV)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,8 +85,17 @@
                 <div class="status-atributos-wrapper">
                     <!-- ATRIBUTOS -->
                     <div class="atributos-lado">
-                        <h2 class="section-title">Atributos</h2>
-                        <div class="atributos-container">
+                        <h2 class="section-title glow-text">Atributos</h2>
+                        <div class="atributos-container premium-hexagon">
+                            <!-- SVG lines for pentagram structure -->
+                            <svg class="pentagram-lines" viewBox="0 0 250 250">
+                                <polygon points="125,25 215,95 180,205 70,205 35,95" fill="none" stroke="rgba(179,0,0,0.4)" stroke-width="2" stroke-dasharray="4" />
+                                <line x1="125" y1="25" x2="180" y2="205" stroke="rgba(179,0,0,0.2)" stroke-width="1.5" />
+                                <line x1="180" y1="205" x2="35" y2="95" stroke="rgba(179,0,0,0.2)" stroke-width="1.5" />
+                                <line x1="35" y1="95" x2="215" y2="95" stroke="rgba(179,0,0,0.2)" stroke-width="1.5" />
+                                <line x1="215" y1="95" x2="70" y2="205" stroke="rgba(179,0,0,0.2)" stroke-width="1.5" />
+                                <line x1="70" y1="205" x2="125" y2="25" stroke="rgba(179,0,0,0.2)" stroke-width="1.5" />
+                            </svg>
                             <div class="attr agi">
                                 <label>AGI</label>
                                 <input type="number" id="attr-agi" value="1">
@@ -98,89 +121,98 @@
 
                     <!-- STATUS -->
                     <div class="status-lado">
-                        <h2 class="section-title">Status</h2>
+                        <h2 class="section-title glow-text">Status</h2>
                         
-                        <div class="status-bar pv">
+                        <div class="status-bar pv glass-panel">
                             <div class="status-header">
-                                <span>Pontos de Vida (PV)</span>
+                                <span class="sh-title">Pontos de Vida (PV)</span>
                             </div>
                             <div class="status-inputs">
-                                <input type="number" id="pv-atual" value="10" oninput="atualizarEstadosSaude()"> / <input type="number" id="pv-total" value="10" oninput="atualizarEstadosSaude()">
+                                <input type="number" id="pv-atual" value="10" oninput="atualizarEstadosSaude()">
+                                <span class="divisor">/</span>
+                                <input type="number" id="pv-total" value="10" oninput="atualizarEstadosSaude()">
                             </div>
-                            <div id="pv-status-label" style="text-align: center; font-size: 10px; font-weight: bold; padding-bottom: 5px; text-transform: uppercase; color: #888;">Estável</div>
+                            <div id="pv-status-label" class="status-health-label">Estável</div>
                         </div>
 
-                        <div class="status-bar pe">
-                            <div class="status-header" style="display: flex; justify-content: space-between;">
-                                <span>Pontos de Esforço (PE)</span>
-                                <span style="font-size: 11px; color: #888;">Lim. Turno: <span id="pe-limite" style="color: #ccc; font-weight: bold;">1</span></span>
+                        <div class="status-bar pe glass-panel">
+                            <div class="status-header flex-header">
+                                <span class="sh-title">Pontos de Esforço (PE)</span>
+                                <span class="limite-turno">Lim. Turno: <span id="pe-limite">1</span></span>
                             </div>
                             <div class="status-inputs">
-                                <input type="number" id="pe-atual" value="5"> / <input type="number" id="pe-total" value="5">
+                                <input type="number" id="pe-atual" value="5">
+                                <span class="divisor">/</span>
+                                <input type="number" id="pe-total" value="5">
                             </div>
                         </div>
 
-                        <div class="status-bar san">
+                        <div class="status-bar san glass-panel">
                             <div class="status-header">
-                                <span>Sanidade (SAN)</span>
+                                <span class="sh-title">Sanidade (SAN)</span>
                             </div>
                             <div class="status-inputs">
-                                <input type="number" id="san-atual" value="20"> / <input type="number" id="san-total" value="20">
+                                <input type="number" id="san-atual" value="20">
+                                <span class="divisor">/</span>
+                                <input type="number" id="san-total" value="20">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- DEFESAS E RESISTÊNCIAS -->
-                <div class="defesas-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px;">
-                    <div class="box-neo" style="background: var(--cinza-dark); padding: 15px; border-radius: 6px; border: 1px solid #333;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 5px;">
-                            <h3 style="font-family: 'Share Tech Mono'; color: var(--vermelho-ordem); margin: 0; font-size: 16px;">Defesas</h3>
-                            <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 5px;">
-                                Desloc. (m): <input type="number" id="deslocamento" value="9" style="width: 40px; background: #000; border: 1px solid #555; color: white; text-align: center; font-family: 'Share Tech Mono'; padding: 2px; height: 20px;">
+                <div class="defesas-grid">
+                    <div class="box-neo glass-panel">
+                        <div class="box-neo-header">
+                            <h3 class="glow-text-small">Defesas</h3>
+                            <label class="deslocamento-label">
+                                Desloc. (m): 
+                                <input type="number" id="deslocamento" value="9" class="input-cyber-small">
                             </label>
                         </div>
-                        <div style="display: flex; gap: 10px; margin-top: 15px;">
-                            <div class="defesa-item" style="text-align: center; flex: 1;">
-                                <div style="font-size: 12px; color: #888; font-weight: bold;">PASSIVA</div>
-                                <input type="number" id="def-passiva" readonly style="width: 100%; text-align: center; font-size: 24px; background: transparent; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px;">
+                        <div class="defesas-flex">
+                            <div class="defesa-item">
+                                <div class="def-title">PASSIVA</div>
+                                <input type="number" id="def-passiva" readonly class="def-input">
                             </div>
-                            <div class="defesa-item" style="text-align: center; flex: 1;">
-                                <div style="font-size: 12px; color: #888; font-weight: bold;">ESQUIVA</div>
-                                <input type="number" id="def-esquiva" readonly style="width: 100%; text-align: center; font-size: 24px; background: transparent; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px;">
+                            <div class="defesa-item">
+                                <div class="def-title">ESQUIVA</div>
+                                <input type="number" id="def-esquiva" readonly class="def-input">
                             </div>
-                            <div class="defesa-item" style="text-align: center; flex: 1;">
-                                <div style="font-size: 12px; color: #888; font-weight: bold;">BLOQUEIO</div>
-                                <input type="number" id="def-bloqueio" readonly style="width: 100%; text-align: center; font-size: 24px; background: transparent; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px;">
+                            <div class="defesa-item">
+                                <div class="def-title">BLOQUEIO</div>
+                                <input type="number" id="def-bloqueio" readonly class="def-input">
                             </div>
-                            <div class="defesa-item" style="text-align: center; width: 60px;">
-                                <div style="font-size: 10px; color: #ffaa00; font-weight: bold;">+ EQUIP.</div>
-                                <input type="number" id="def-equip" value="0" oninput="recalcularDefesas()" style="width: 100%; text-align: center; font-size: 16px; background: #222; border: 1px dashed #ffaa00; color: #ffaa00; padding: 9px 5px; border-radius: 4px;">
+                            <div class="defesa-item def-equip-box">
+                                <div class="def-title equip-color">+ EQUIP.</div>
+                                <input type="number" id="def-equip" value="0" oninput="recalcularDefesas()" class="def-input equip-input">
                             </div>
-                            <div class="defesa-item" style="text-align: center; width: 60px;">
-                                <div style="font-size: 10px; color: #00eeff; font-weight: bold;">RD GERAL</div>
-                                <input type="number" id="rd-geral" value="0" style="width: 100%; text-align: center; font-size: 16px; background: #111; border: 1px solid #00eeff; color: #00eeff; padding: 9px 5px; border-radius: 4px;">
+                            <div class="defesa-item rd-geral-box">
+                                <div class="def-title rd-color">RD GERAL</div>
+                                <input type="number" id="rd-geral" value="0" class="def-input rd-input">
                             </div>
                         </div>
                     </div>
 
-                    <div class="box-neo" style="background: var(--cinza-dark); padding: 15px; border-radius: 6px; border: 1px solid #333;">
-                        <h3 style="font-family: 'Share Tech Mono'; color: var(--vermelho-ordem); margin-top: 0; padding-bottom: 5px; border-bottom: 1px solid #444; font-size: 16px;">Resistências</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Física <input type="number" id="res-fisica" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Balística <input type="number" id="res-balistica" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Sangue <input type="number" id="res-sangue" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Morte <input type="number" id="res-morte" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Energia <input type="number" id="res-energia" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
-                            <label style="display: flex; justify-content: space-between; align-items: center; font-family: 'Inter'; font-size: 13px; color: #ccc;">Conhecimt. <input type="number" id="res-conhecimento" style="width: 40px; background:#000; border:1px solid #555; color:#fff; text-align:center; padding: 2px;"></label>
+                    <div class="box-neo glass-panel">
+                        <div class="box-neo-header">
+                            <h3 class="glow-text-small">Resistências</h3>
+                        </div>
+                        <div class="resistencias-grid">
+                            <label class="res-item">Física <input type="number" id="res-fisica" class="input-cyber-small"></label>
+                            <label class="res-item">Balística <input type="number" id="res-balistica" class="input-cyber-small"></label>
+                            <label class="res-item">Sangue <input type="number" id="res-sangue" class="input-cyber-small"></label>
+                            <label class="res-item">Morte <input type="number" id="res-morte" class="input-cyber-small"></label>
+                            <label class="res-item">Energia <input type="number" id="res-energia" class="input-cyber-small"></label>
+                            <label class="res-item">Conhec. <input type="number" id="res-conhecimento" class="input-cyber-small"></label>
                         </div>
                     </div>
                 </div>
 
                 <!-- CONDIÇÕES -->
-                <div class="condicoes-box" style="margin-top: 25px; padding: 15px; border-radius: 6px; border: 1px dashed #555;">
-                    <h3 style="font-family: 'Share Tech Mono'; color: #fff; margin-top: 0; font-size: 16px;">Condições</h3>
-                    <div id="container-condicoes" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                <div class="condicoes-box glass-panel-dashed">
+                    <h3 class="glow-text-small">Condições</h3>
+                    <div id="container-condicoes" class="condicoes-flex">
                         <button type="button" class="btn-condicao" data-active="false">Morrendo</button>
                         <button type="button" class="btn-condicao" data-active="false">Sangrando</button>
                         <button type="button" class="btn-condicao" data-active="false">Abalado</button>
