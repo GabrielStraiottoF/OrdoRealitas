@@ -240,7 +240,16 @@ function inicializarDashboard() {
         setVal('nex', d.nex || 5);
         setVal('nivel-gastos', d.nivel_gastos || "baixo");
         setVal('url-token', d.url_token || "");
+        
+        // Carregar Transformação do Token
+        if (d.token_params) {
+            setVal('token-x', d.token_params.x || 0);
+            setVal('token-y', d.token_params.y || 0);
+            setVal('token-zoom', d.token_params.zoom || 1);
+        }
+
         if(typeof atualizarTokenHTML === 'function') atualizarTokenHTML();
+        if(typeof atualizarTransformacaoToken === 'function') atualizarTransformacaoToken();
 
         // Attrs
         if(d.atributos) {
@@ -352,6 +361,11 @@ async function enviarDadosParaServidor() {
         origem: val('origem'),
         trilha: val('trilha'),
         url_token: val('url-token'),
+        token_params: {
+            x: val('token-x'),
+            y: val('token-y'),
+            zoom: val('token-zoom')
+        },
         nivel_gastos: val('nivel-gastos'),
         classe: val('classe-display'),
         nex: val('nex'),
@@ -772,9 +786,34 @@ function atualizarTokenHTML() {
         img.src = url;
         img.style.display = 'block';
         placeholder.style.display = 'none';
+        atualizarTransformacaoToken(); // Aplica a transformação sempre que carrega
     } else {
         img.src = '';
         img.style.display = 'none';
         placeholder.style.display = 'block';
     }
 }
+
+// ====== LÓGICA DE TRANSFORMAÇÃO MANUAL DO TOKEN (SLIDERS) ======
+
+window.atualizarTransformacaoToken = function() {
+    const x = document.getElementById('token-x')?.value || 0;
+    const y = document.getElementById('token-y')?.value || 0;
+    const zoom = document.getElementById('token-zoom')?.value || 1;
+    const img = document.getElementById('token-img');
+
+    // Atualiza os labels numéricos
+    const valX = document.getElementById('val-x');
+    const valY = document.getElementById('val-y');
+    const valZoom = document.getElementById('val-zoom');
+    
+    if (valX) valX.textContent = x;
+    if (valY) valY.textContent = y;
+    if (valZoom) valZoom.textContent = parseFloat(zoom).toFixed(1);
+
+    if (img) {
+        // Aplica a transformação: posição e escala
+        img.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+    }
+};
+

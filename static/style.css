@@ -779,3 +779,101 @@ body.dashboard-body {
 
 /* Condicoes */
 .condicoes-flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;}
+/* ========================================================
+   CONTROLES MANUAIS DO TOKEN (SLIDERS)
+   ======================================================== */
+
+.token-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 170px;
+}
+
+.token-img-wrapper {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid var(--vermelho-ordem);
+    box-shadow: 0 0 15px rgba(179,0,0,0.5);
+    overflow: hidden; /* IMPORTANTE: Mascara a imagem */
+    background: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#token-img {
+    max-width: none; /* Permite zoom além do tamanho do container */
+    max-height: none;
+    transition: transform 0.1s ease-out; /* Suaviza o movimento do slider */
+}
+
+.token-manual-controls {
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(20, 20, 20, 0.6);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #222;
+}
+
+.slider-group {
+    margin-bottom: 8px;
+}
+
+.slider-group:last-child {
+    margin-bottom: 0;
+}
+
+.slider-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--cinza-light);
+    font-family: 'Share Tech Mono';
+    margin-bottom: 3px;
+    text-transform: uppercase;
+}
+
+.slider-group label span {
+    color: var(--vermelho-neon);
+}
+
+/* Custom Range Input Styling (Neon Red) */
+.slider-group input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+}
+
+.slider-group input[type=range]:focus {
+    outline: none;
+}
+
+.slider-group input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #222;
+    border-radius: 2px;
+    border: 1px solid #333;
+}
+
+.slider-group input[type=range]::-webkit-slider-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background: var(--vermelho-ordem);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -6px;
+    box-shadow: 0 0 5px var(--vermelho-neon);
+}
+
+.slider-group input[type=range]:active::-webkit-slider-thumb {
+    background: var(--vermelho-neon);
+    box-shadow: 0 0 10px var(--vermelho-neon);
+}
+
