@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,8 +8,12 @@ from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models import db, Agente
 
-# Carregar variáveis de ambiente
+# Carregar variáveis de ambiente (.env)
 load_dotenv()
+
+# Configuração de Logging para ajudar no Render
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -17,9 +22,16 @@ CORS(app)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-development')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback-jwt-secret-development')
 
+# Detectar qual banco usar
 db_url = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///agentes_orm.db')
+
 if db_url.startswith("postgres://"):
+    # Render fornece URLs postgres://, mas SQLAlchemy exige postgresql://
     db_url = db_url.replace("postgres://", "postgresql://", 1)
+    logger.info("Utilizando banco de dados PostgreSQL persistente.")
+elif "sqlite" in db_url:
+    logger.warning("ALERTA: Utilizando SQLite. Os dados SERÃO PERDIDOS ao reiniciar no Render!")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -27,8 +39,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 jwt = JWTManager(app)
 
+# Criar tabelas se não existirem (essencial no primeiro deploy)
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        logger.info("Banco de dados inicializado com sucesso.")
+    except Exception as e:
+        logger.error(f"Erro ao inicializar o banco de dados: {e}")
 
 @app.route('/')
 def index():
@@ -117,9 +134,6 @@ def salvar_ficha():
         return jsonify({"mensagem": "Erro interno ao salvar a ficha."}), 500
 
 if __name__ == '__main__':
-    # O Gunicorn será usado. Rodando esse arquivo fará um fallback simples.
-    with app.app_context():
-        # Apenas como utilidade local para criar tabelas se preciso
-        db.create_all()
+    # Fallback para desenvolvimento local
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
