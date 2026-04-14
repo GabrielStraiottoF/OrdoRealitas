@@ -8,25 +8,20 @@ from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models import db, Agente
 
-# Carregar variáveis de ambiente (.env)
 load_dotenv()
 
-# Configuração de Logging para ajudar no Render
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
 
-# Configurações usando Variáveis de Ambiente
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret-development')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback-jwt-secret-development')
 
-# Detectar qual banco usar
-db_url = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///agentes_orm.db')
+db_url = os.getenv('DATABASE_URL', 'sqlite:///agentes_orm.db')
 
 if db_url.startswith("postgres://"):
-    # Render fornece URLs postgres://, mas SQLAlchemy exige postgresql://
     db_url = db_url.replace("postgres://", "postgresql://", 1)
     logger.info("Utilizando banco de dados PostgreSQL persistente.")
 elif "sqlite" in db_url:
@@ -35,11 +30,9 @@ elif "sqlite" in db_url:
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializar extensões
 db.init_app(app)
 jwt = JWTManager(app)
 
-# Criar tabelas se não existirem (essencial no primeiro deploy)
 with app.app_context():
     try:
         db.create_all()
@@ -63,7 +56,6 @@ def dashboard():
 def registrar():
     dados = request.json
     try:
-        # Verificar se o email já existe
         agente_existente = Agente.query.filter_by(email=dados['email']).first()
         if agente_existente:
             return jsonify({"mensagem": "Este e-mail já está na base!"}), 400
@@ -92,8 +84,6 @@ def login():
             dados_ficha = json.loads(agente.ficha_json) if agente.ficha_json else {}
         except:
             dados_ficha = {}
-
-        # Criar o token de acesso
         access_token = create_access_token(identity=agente.email)
 
         return jsonify({
@@ -112,11 +102,8 @@ def login():
 @app.route('/salvar_ficha', methods=['POST'])
 @jwt_required()
 def salvar_ficha():
-    # O email vem direto do token confiável gerado no login
     email_logado = get_jwt_identity()
     dados = request.get_json()
-
-    # Sobrescreve/Garante que o e-mail no JSON é o do usuário logado
     dados['email_dono'] = email_logado
     ficha_string = json.dumps(dados)
 
@@ -134,6 +121,5 @@ def salvar_ficha():
         return jsonify({"mensagem": "Erro interno ao salvar a ficha."}), 500
 
 if __name__ == '__main__':
-    # Fallback para desenvolvimento local
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
