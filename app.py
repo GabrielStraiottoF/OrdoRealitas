@@ -53,9 +53,6 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 cors_origins = os.getenv("CORS_ORIGINS", "").strip()
 if cors_origins:
     CORS(app, origins=[origin.strip() for origin in cors_origins.split(",") if origin.strip()])
-else:
-    # A aplicação serve o próprio frontend; CORS aberto não é necessário por padrão.
-    CORS(app)
 
 db.init_app(app)
 jwt = JWTManager(app)
