@@ -16,7 +16,8 @@ load_dotenv()
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+instance_path = "/tmp/instance" if os.getenv("VERCEL") else os.path.join(os.path.dirname(__file__), "instance")
+app = Flask(__name__, instance_path=instance_path)
 
 environment = os.getenv("NODE_ENV", os.getenv("FLASK_ENV", "development")).lower()
 is_production = environment in {"production", "prod"}
