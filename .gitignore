@@ -1,2 +1,6 @@
 .env
 agentes_orm.db
+__pycache__/
+*.py[cod]
+.venv/
+venv/

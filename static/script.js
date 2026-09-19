@@ -43,13 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Calculo automatico das fichas de Status
 function configurarCalculoAutomatico() {
-    const inputsGatilho = ['classe-display', 'nex', 'attr-vig', 'attr-pre'];
+    const inputsGatilho = ['classe-display', 'nex', 'attr-agi', 'attr-vig', 'attr-pre'];
     
     inputsGatilho.forEach(id => {
         const el = document.getElementById(id);
         if(el) {
             el.addEventListener('change', () => { recalcularStatus(); recalcularDefesas(); });
-            if (id === 'nex' || id === 'attr-vig' || id === 'attr-pre' || id === 'attr-agi') {
+            if (id === 'nex' || id === 'attr-agi' || id === 'attr-vig' || id === 'attr-pre') {
                  el.addEventListener('input', () => { recalcularStatus(); recalcularDefesas(); });
             }
         }
@@ -94,7 +94,7 @@ function recalcularStatus() {
 }
 
 // Toast / Alertas Bonitos
-function mostrarNotificacao(mensagem, erro = false) {
+function escaparHTML(valor) {\n    return String(valor ?? '').replace(/[&<>\"']/g, caractere => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[caractere]));\n}\n\nfunction mostrarNotificacao(mensagem, erro = false) {
     const toast = document.getElementById('toast-notificacao');
     if (!toast) return;
     toast.textContent = mensagem;
@@ -518,7 +518,7 @@ function criarCardRitual(dados = {}) {
     div.dataset.elemento = dados.elemento || '';
     
     div.innerHTML = `
-        <input type="text" class="titulo-ritual" placeholder="Nome do Ritual" value="${dados.nome || ''}">
+        <input type="text" class="titulo-ritual" placeholder="Nome do Ritual" value="${escaparHTML(dados.nome)}">
         <button type="button" class="btn-remover-ritual" onclick="this.parentElement.remove()">×</button>
         <div class="ritual-header">
             <select class="sel-elemento" onchange="this.parentElement.parentElement.dataset.elemento = this.value">
@@ -535,15 +535,15 @@ function criarCardRitual(dados = {}) {
                 <option value="3" ${dados.circulo === '3' ? 'selected' : ''}>3º Círculo</option>
                 <option value="4" ${dados.circulo === '4' ? 'selected' : ''}>4º Círculo</option>
             </select>
-            <input type="text" class="inp-custo-pe" placeholder="Custo PE" value="${dados.custo_pe || ''}">
+            <input type="text" class="inp-custo-pe" placeholder="Custo PE" value="${escaparHTML(dados.custo_pe)}">
         </div>
         <div class="ritual-body">
-            <input type="text" class="inp-exec" placeholder="Execução" value="${dados.execucao || ''}">
-            <input type="text" class="inp-alcance" placeholder="Alcance" value="${dados.alcance || ''}">
-            <input type="text" class="inp-alvo" placeholder="Alvo/Área" value="${dados.alvo || ''}">
-            <input type="text" class="inp-duracao" placeholder="Duração" value="${dados.duracao || ''}">
+            <input type="text" class="inp-exec" placeholder="Execução" value="${escaparHTML(dados.execucao)}">
+            <input type="text" class="inp-alcance" placeholder="Alcance" value="${escaparHTML(dados.alcance)}">
+            <input type="text" class="inp-alvo" placeholder="Alvo/Área" value="${escaparHTML(dados.alvo)}">
+            <input type="text" class="inp-duracao" placeholder="Duração" value="${escaparHTML(dados.duracao)}">
         </div>
-        <textarea class="ritual-desc" rows="3" placeholder="Descrição / Dano...">${dados.desc || ''}</textarea>
+        <textarea class="ritual-desc" rows="3" placeholder="Descrição / Dano...">${escaparHTML(dados.desc)}</textarea>
     `;
     container.appendChild(div);
 }
@@ -599,11 +599,11 @@ function criarLinhaArma(dados = {}) {
     const div = document.createElement('div');
     div.className = 'arma-linha';
     div.innerHTML = `
-        <input type="text" class="nome" placeholder="Nome da Arma" value="${dados.nome || ''}">
-        <input type="text" class="teste" placeholder="Teste (Ex: 2d20+5)" value="${dados.teste || ''}">
-        <input type="text" class="dano" placeholder="Dano" value="${dados.dano || ''}">
-        <input type="text" class="critico" placeholder="Crítico/Alcance" value="${dados.critico || ''}">
-        <input type="number" class="inp-peso-arma" placeholder="Peso" value="${dados.peso || 1}" oninput="recalcularPeso()" style="text-align: center;">
+        <input type="text" class="nome" placeholder="Nome da Arma" value="${escaparHTML(dados.nome)}">
+        <input type="text" class="teste" placeholder="Teste (Ex: 2d20+5)" value="${escaparHTML(dados.teste)}">
+        <input type="text" class="dano" placeholder="Dano" value="${escaparHTML(dados.dano)}">
+        <input type="text" class="critico" placeholder="Crítico/Alcance" value="${escaparHTML(dados.critico)}">
+        <input type="number" class="inp-peso-arma" placeholder="Peso" value="${escaparHTML(dados.peso ?? 1)}" oninput="recalcularPeso()" style="text-align: center;">
         <button type="button" class="btn-remover" onclick="this.parentElement.remove(); recalcularPeso();">X</button>
     `;
     container.appendChild(div);
@@ -616,7 +616,7 @@ function criarLinhaItem(dados = {}) {
     const div = document.createElement('div');
     div.className = 'item-linha';
     div.innerHTML = `
-        <input type="text" class="nome" placeholder="Aparelho ou Recurso" value="${dados.nome || ''}">
+        <input type="text" class="nome" placeholder="Aparelho ou Recurso" value="${escaparHTML(dados.nome)}">
         <select class="categoria">
             <option value="0" ${dados.categoria === '0' ? 'selected' : ''}>0</option>
             <option value="I" ${dados.categoria === 'I' ? 'selected' : ''}>I</option>
@@ -624,7 +624,7 @@ function criarLinhaItem(dados = {}) {
             <option value="III" ${dados.categoria === 'III' ? 'selected' : ''}>III</option>
             <option value="IV" ${dados.categoria === 'IV' ? 'selected' : ''}>IV</option>
         </select>
-        <input type="number" class="inp-peso" value="${dados.peso || 1}" oninput="recalcularPeso()">
+        <input type="number" class="inp-peso" value="${escaparHTML(dados.peso ?? 1)}" oninput="recalcularPeso()">
         <button type="button" class="btn-remover" onclick="this.parentElement.remove(); recalcularPeso();">X</button>
     `;
     container.appendChild(div);
@@ -637,10 +637,10 @@ function criarCardPoder(dados = {}) {
     const div = document.createElement('div');
     div.className = 'poder-card';
     div.innerHTML = `
-        <input type="text" class="titulo" placeholder="Nome da Habilidade" value="${dados.nome || ''}">
+        <input type="text" class="titulo" placeholder="Nome da Habilidade" value="${escaparHTML(dados.nome)}">
         <button type="button" class="btn-remover btn-remover-abs" onclick="this.parentElement.remove()">X</button>
-        <input type="text" class="custo" placeholder="Custo (Ex: 2 PE)" value="${dados.custo || ''}">
-        <textarea class="desc" placeholder="Descrição completa...">${dados.desc || ''}</textarea>
+        <input type="text" class="custo" placeholder="Custo (Ex: 2 PE)" value="${escaparHTML(dados.custo)}">
+        <textarea class="desc" placeholder="Descrição completa...">${escaparHTML(dados.desc)}</textarea>
     `;
     container.appendChild(div);
 }
