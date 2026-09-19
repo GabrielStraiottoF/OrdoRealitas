@@ -20,15 +20,17 @@ logger = logging.getLogger(__name__)
 instance_path = "/tmp/instance" if os.getenv("VERCEL") else os.path.join(os.path.dirname(__file__), "instance")
 app = Flask(__name__, instance_path=instance_path)
 
+is_vercel = bool(os.getenv("VERCEL"))
 environment = os.getenv("NODE_ENV", os.getenv("FLASK_ENV", "development")).lower()
-is_production = environment in {"production", "prod"}
+is_production = is_vercel or environment in {"production", "prod"}
 
 secret_key = os.getenv("SECRET_KEY")
 jwt_secret_key = os.getenv("JWT_SECRET_KEY")
+secrets_configured = bool(secret_key and jwt_secret_key)
 
-if is_production and (not secret_key or not jwt_secret_key):
-    raise RuntimeError("SECRET_KEY e JWT_SECRET_KEY são obrigatórias em produção.")
-
+# A aplicação deve conseguir responder à página inicial mesmo se o painel de
+# variáveis da Vercel estiver incompleto. Operações autenticadas são bloqueadas
+# abaixo até que os secrets reais sejam configurados.
 app.config["SECRET_KEY"] = secret_key or "local-development-secret-change-me"
 app.config["JWT_SECRET_KEY"] = jwt_secret_key or "local-development-jwt-secret-change-me"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
@@ -36,17 +38,21 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
 )
 
 db_url = os.getenv("DATABASE_URL")
+database_configured = bool(db_url)
+
 if not db_url:
     if is_production:
-        raise RuntimeError("DATABASE_URL é obrigatória em produção.")
-    db_url = "sqlite:///agentes_orm.db"
-    logger.warning("DATABASE_URL ausente: usando SQLite apenas para desenvolvimento.")
+        logger.error("DATABASE_URL não configurada. Configure o PostgreSQL na Vercel.")
+        db_url = "sqlite:////tmp/ordorealitas-unconfigured.db"
+    else:
+        db_url = "sqlite:///agentes_orm.db"
+        logger.warning("DATABASE_URL ausente: usando SQLite apenas para desenvolvimento.")
 
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 if os.getenv("VERCEL") and db_url.startswith("sqlite"):
-    raise RuntimeError("SQLite não é suportado como armazenamento persistente na Vercel. Configure DATABASE_URL com PostgreSQL.")
+    database_configured = False
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -63,22 +69,19 @@ db.init_app(app)
 jwt = JWTManager(app)
 
 
-def initialize_database():
-    with app.app_context():
-        try:
-            db.create_all()
-            logger.info("Banco de dados inicializado com sucesso.")
-        except Exception:
-            logger.exception("Falha ao inicializar o banco de dados.")
-            if is_production:
-                raise
+def database_ready():
+    return database_configured
 
 
-initialize_database()
+def auth_ready():
+    return secrets_configured
 
 
 @app.get("/health")
 def health():
+    if not database_ready():
+        return jsonify({"status": "degraded", "database": "not_configured"}), 503
+
     try:
         with app.app_context():
             db.session.execute(text("SELECT 1"))
@@ -111,8 +114,17 @@ def normalize_email(value):
     return str(value or "").strip().lower()
 
 
+def service_unavailable(message):
+    return jsonify({"mensagem": message}), 503
+
+
 @app.post("/registrar")
 def registrar():
+    if not database_ready():
+        return service_unavailable("Banco de dados não configurado. Configure DATABASE_URL na Vercel.")
+    if not auth_ready():
+        return service_unavailable("Autenticação não configurada. Configure SECRET_KEY e JWT_SECRET_KEY na Vercel.")
+
     dados = get_json_payload()
     nome = str(dados.get("nome") or "").strip()
     email = normalize_email(dados.get("email"))
@@ -142,11 +154,16 @@ def registrar():
     except Exception:
         db.session.rollback()
         logger.exception("Erro ao registrar agente.")
-        return jsonify({"mensagem": "Erro interno no servidor."}), 500
+        return jsonify({"mensagem": "Não foi possível acessar o banco de dados."}), 503
 
 
 @app.post("/login")
 def login():
+    if not database_ready():
+        return service_unavailable("Banco de dados não configurado. Configure DATABASE_URL na Vercel.")
+    if not auth_ready():
+        return service_unavailable("Autenticação não configurada. Configure SECRET_KEY e JWT_SECRET_KEY na Vercel.")
+
     dados = get_json_payload()
     email = normalize_email(dados.get("email"))
     senha = str(dados.get("senha") or "")
@@ -154,7 +171,11 @@ def login():
     if not email or not senha:
         return jsonify({"mensagem": "E-mail e senha são obrigatórios."}), 400
 
-    agente = Agente.query.filter_by(email=email).first()
+    try:
+        agente = Agente.query.filter_by(email=email).first()
+    except Exception:
+        logger.exception("Erro ao consultar agente no login.")
+        return service_unavailable("Não foi possível acessar o banco de dados.")
 
     if not agente or not check_password_hash(agente.senha, senha):
         return jsonify({"mensagem": "E-mail ou senha inválidos."}), 401
@@ -184,19 +205,27 @@ def login():
 @app.post("/salvar_ficha")
 @jwt_required()
 def salvar_ficha():
+    if not database_ready():
+        return service_unavailable("Banco de dados não configurado. Configure DATABASE_URL na Vercel.")
+    if not auth_ready():
+        return service_unavailable("Autenticação não configurada. Configure SECRET_KEY e JWT_SECRET_KEY na Vercel.")
+
     email_logado = normalize_email(get_jwt_identity())
     dados = get_json_payload()
 
-    agente = Agente.query.filter_by(email=email_logado).first()
+    try:
+        agente = Agente.query.filter_by(email=email_logado).first()
+    except Exception:
+        logger.exception("Erro ao consultar agente para salvar ficha.")
+        return service_unavailable("Não foi possível acessar o banco de dados.")
+
     if not agente:
         return jsonify({"mensagem": "Agente não encontrado na base de dados!"}), 404
 
-    # O proprietário da ficha vem exclusivamente do token JWT.
     dados["email_dono"] = email_logado
 
     try:
         agente.ficha_json = json.dumps(dados, ensure_ascii=False)
-        # Mantém a classe principal coerente com a ficha salva.
         classe = str(dados.get("classe") or "").strip().lower()
         if classe in {"combatante", "especialista", "ocultista"}:
             agente.classe = classe
@@ -206,7 +235,7 @@ def salvar_ficha():
     except Exception:
         db.session.rollback()
         logger.exception("Erro ao salvar a ficha do agente %s.", email_logado)
-        return jsonify({"mensagem": "Erro interno ao salvar a ficha."}), 500
+        return service_unavailable("Não foi possível salvar a ficha no banco de dados.")
 
 
 @jwt.unauthorized_loader
