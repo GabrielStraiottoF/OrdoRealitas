@@ -15,7 +15,7 @@
 
         <form id="formLogin">
             <input type="email" name="email" placeholder="E-mail de Agente" required autocomplete="email">
-            <input type="password" name="senha" placeholder="Senha de Acesso" required>
+            <input type="password" name="senha" placeholder="Senha de Acesso" required autocomplete="current-password">
 
             <select id="classe" name="classe">
                 <option value="" disabled selected>Selecione seu Departamento</option>
@@ -32,6 +32,66 @@
                 onclick="window.location.href='/pagina_cadastro'">RECRUTAMENTO</button>
         </div>
     </div>
+
+    <script>
+    // O login não depende do script geral do dashboard.
+    // Isso evita que um erro em outra parte do JavaScript impeça a autenticação.
+    (() => {
+        const form = document.getElementById('formLogin');
+        if (!form) return;
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const button = form.querySelector('button[type="submit"]');
+            const email = form.elements.email.value.trim().toLowerCase();
+            const senha = form.elements.senha.value;
+
+            if (!email || !senha) {
+                alert('Informe o e-mail e a senha.');
+                return;
+            }
+
+            button.disabled = true;
+            const textoOriginal = button.textContent;
+            button.textContent = 'AUTENTICANDO...';
+
+            try {
+                const resposta = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const texto = await resposta.text();
+                let resultado;
+                try {
+                    resultado = JSON.parse(texto);
+                } catch {
+                    throw new Error(`O servidor respondeu com HTTP ${resposta.status}.`);
+                }
+
+                if (!resposta.ok) {
+                    throw new Error(resultado.mensagem || `Falha no login (HTTP ${resposta.status}).`);
+                }
+
+                if (!resultado.token || !resultado.agente) {
+                    throw new Error('Resposta de login inválida: token ou agente ausente.');
+                }
+
+                localStorage.setItem('auth_token', resultado.token);
+                localStorage.setItem('agente', JSON.stringify(resultado.agente));
+                window.location.assign('/dashboard');
+            } catch (erro) {
+                console.error('Erro no login:', erro);
+                alert(erro.message || 'Não foi possível realizar o login.');
+            } finally {
+                button.disabled = false;
+                button.textContent = textoOriginal;
+            }
+        });
+    })();
+    </script>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
