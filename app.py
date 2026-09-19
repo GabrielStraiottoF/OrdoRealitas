@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
+from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from models import Agente, db
@@ -44,6 +45,9 @@ if not db_url:
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
+if os.getenv("VERCEL") and db_url.startswith("sqlite"):
+    raise RuntimeError("SQLite não é suportado como armazenamento persistente na Vercel. Configure DATABASE_URL com PostgreSQL.")
+
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -75,7 +79,13 @@ initialize_database()
 
 @app.get("/health")
 def health():
-    return jsonify({"status": "ok"}), 200
+    try:
+        with app.app_context():
+            db.session.execute(text("SELECT 1"))
+        return jsonify({"status": "ok", "database": "ok"}), 200
+    except Exception:
+        logger.exception("Health check do banco falhou.")
+        return jsonify({"status": "degraded", "database": "error"}), 503
 
 
 @app.get("/")
